@@ -1,6 +1,8 @@
 
 var ALL_BOTS = 'All Bots';
 
+var ERRORS = 'errors';
+
 var bot_logs = {};
 var bot_queues = {};
 var reload_queues = null;
@@ -178,9 +180,15 @@ function select_bot(bot_id) {
     document.getElementById('monitor-target').innerHTML = bot_id;
     load_bot_queues();
     
-    reload_queues = setInterval(function () {
-        load_bot_queues();
-    }, RELOAD_QUEUES_EVERY * 1000);
+    if (bot_id != ERRORS) {
+        reload_queues = setInterval(function () {
+            load_bot_queues();
+        }, RELOAD_QUEUES_EVERY * 1000);
+	$('#queues-panel').show();
+    }
+    else {
+	$('#queues-panel').hide();
+    }
 
     if(bot_id != ALL_BOTS) {
         $("#logs-panel").css('display', 'block');
@@ -227,6 +235,12 @@ $.getJSON(MANAGEMENT_SCRIPT + '?scope=botnet&action=status')
             
         li_element.appendChild(link_element);
         sidemenu.appendChild(li_element);        
+
+        $('<li>').append(
+		$('<a>').attr('href', '#')
+			.attr('onclick', 'select_bot("' + ERRORS + '"); return false')
+			.html('All ERRORs')
+		).appendTo(sidemenu);
         
         var bots_ids = Object.keys(data);
         bots_ids.sort();
